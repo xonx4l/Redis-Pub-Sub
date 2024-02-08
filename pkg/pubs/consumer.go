@@ -31,7 +31,14 @@ func (c*Consumer) recieve (stream pb.PubSubService_subscribeClient, ctx content.
 			return
 		default:
 			msg,err := stream.Recv
-			
+			if err != nil {
+				if err == io.EOF{
+					return
+				}
+				return
+			}
+
+			c.message <- msg
 		}
 	 }
 }
