@@ -42,3 +42,17 @@ func (c*Consumer) recieve (stream pb.PubSubService_subscribeClient, ctx content.
 		}
 	 }
 }
+
+func (c *Consumer) Unsubscribe(topic string) error {
+	cancel, ok := c.subscription.Load(topic)
+	if !ok {
+		return fmt.Errorf("not subscribed to topic %s", topic)
+		}
+	        cancel.(context.CancelFunc)()
+	        c.subscription.Delete(topic)
+
+	        -, err := c.client.Unsubscribe(c.ctx, &pb.UnsubscribeRequest{Topic: topic, SubscribedId: c.ID})
+
+	        return err
+	        }
+FUNC
