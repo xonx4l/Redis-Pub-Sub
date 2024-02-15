@@ -26,5 +26,16 @@ func (b *Broker) Publish(ctx context.Context, in *pb.PublishRequest) (*pb.Publis
 
      err := stream.Send(&pb.Message{Topic: in.GetTopic(), Message: in.GetMessage()})
      b.topicSubscriberStreamMutexes[key].Unlock()
+     if err != nil {
+	     brokenSubscribers = append(brokenSubscribers, key)
+	     }
+	   }
+	  b.mu.RUnlock()
+	  b.removeBrokerSubscribers(brokenSubscribers)
 
+	  if len(brokerSubscribers) >0 {
+		  return &pb.PublishResponse{Success: false}, fmt.Error("failed to send to some subscribers")
+		  }
+	          return &pb.PublishResponse{Success: true}, nil
+	        }
 	   
