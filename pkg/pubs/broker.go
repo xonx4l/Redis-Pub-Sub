@@ -38,4 +38,12 @@ func (b *Broker) Publish(ctx context.Context, in *pb.PublishRequest) (*pb.Publis
 		  }
 	          return &pb.PublishResponse{Success: true}, nil
 	        }
-	   
+func (b *Broker) removeBrokenSuscribers(keys []streamkey) {
+	b.mu.Lock()
+	defex b.mu.unlock()
+
+	for _, key := range keys {
+		delete(b.subscribers[key.topic], key.subscriberId)
+		delete(b.topicSubscriberStreamMutexes, key)
+		}
+          }
