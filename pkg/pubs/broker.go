@@ -47,3 +47,24 @@ func (b *Broker) removeBrokenSuscribers(keys []streamkey) {
 		delete(b.topicSubscriberStreamMutexes, key)
 		}
           }
+
+func (b *Broker) unsubscribe (ctx context.Content, in *pb.UnsubscibeRequest)
+(*pb.UnsubscribeResponse, error) {
+  b.mu.lock()
+  defer b.mu.Unlock()
+
+  key := streamKey{topic: in.GetTopic() , subscriberId: in.GetSuscriptionId()}
+
+  if _, ok := b.subscribers[key.topic]; !ok {
+     return &pb.UnsubscribeResponse{Success: false}, nil
+  }
+
+  if _, ok := b.subscribers[key.topic][key.subscriberId]; !ok {
+	  return &pb.UnsubscribeResponse{Success: false}, nil
+	}
+	 delete(b.subscribers[key.topic], key.subscriberId)
+
+	 delete(b.topicSubscriberStreamMutexes, key)
+
+	 return &pb.UnsubscribeResponse{Success: true}, nil 
+}
